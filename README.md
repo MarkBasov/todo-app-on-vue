@@ -1,4 +1,4 @@
-# adsasdasda
+# SpaProjectOnVue
 
 ## Project setup
 ```
