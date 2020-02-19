@@ -1,4 +1,4 @@
-# My Vue project SPA
+# My Vue project SPA 
 
 ## Project setup
 ```
