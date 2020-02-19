@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <Notes headerMsg="Welcome to my test task"/>
+    <Notes
+      headerMsg="Welcome to my test task"/>
   </div>
 </template>
 

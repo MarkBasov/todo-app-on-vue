@@ -1,4 +1,4 @@
-# adsasdasda
+# My Vue project SPA
 
 ## Project setup
 ```
