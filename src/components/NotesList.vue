@@ -1,11 +1,6 @@
 <template>
   <div class="wrapper">
     <h1>{{ headerMsg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
     <h3>Список заметок</h3>
     <button class="btn_showPopup" v-on:click="showPopupCreate">
       &#10010; Создать новую заметку
@@ -15,8 +10,12 @@
     </div>
     <div class="boxNotes">
       <ul>
-        <li>
-          <div id="note"></div>
+        <li v-for="(item) in items"
+                    v-bind:key="item.id">
+          <div id="note">
+            <span>index</span>
+            <button class="close_btn" v-on:click="closePopup">&#10006;</button>
+          </div>
         </li>
       </ul>
     </div>
@@ -39,16 +38,20 @@ export default class Notes extends Vue {
 
   private isActive = false;
 
+  private test = '';
+
   private closePopup(): void {
     this.isCreatePopup = false;
     this.isActive = false;
-    this.$emit('modalClosed');
   }
 
   private showPopupCreate(): void {
     this.isCreatePopup = true;
     this.isActive = true;
-    this.$emit('modalOpened');
+  }
+
+  protected createNote(noteName: string, items: any): void {
+    this.test = noteName;
   }
 }
 </script>

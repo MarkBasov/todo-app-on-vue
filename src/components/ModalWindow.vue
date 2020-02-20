@@ -11,7 +11,8 @@
       <div class="modal-body">
         <slot name="body">
           <div class="headerBody">
-            <input class="input" placeholder="Введите название заметки" />
+            <input v-model="noteName" class="input" placeholder="Введите название заметки"
+            />
           </div>
           <div class="tasksBox">
             <fieldset>
@@ -19,14 +20,14 @@
               <ul>
                 <li v-for="(item, index) in items"
                     v-bind:key="item.id">
-                  <input class="input" />
+                  <input class="input" v-model="item.value" />
                     <button class="deleteTask"
                             v-on:click="deleteItem(index)">
                       &#10006;
                     </button>
                 </li>
               </ul>
-              <button v-on:click="addItem">Добавить задачу</button>
+              <button class="btn_add" v-on:click="addItem">Добавить задачу</button>
             </fieldset>
           </div>
         </slot>
@@ -34,7 +35,7 @@
 
       <div class="modal-footer">
         <slot name="footer">
-          <button class="footer_btn_ok">
+          <button v-on:click="btnAddNote" class="btn_add">
             Добавить
           </button>
         </slot>
@@ -45,6 +46,13 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+// import { required, minLength } from 'vuelidate/lib/validators';
+
+/**
+ * @class
+ * @author Basov M.A
+ * Компонент модального окна
+ */
 
 @Component
 export default class ModalWindow extends Vue {
@@ -53,12 +61,37 @@ export default class ModalWindow extends Vue {
     value: '',
   }];
 
+  // private validations = {
+  //   noteName: {
+  //     required,
+  //     minLength: minLength(4),
+  //   },
+  // };
+
+  private noteName = '';
+
+  /**
+   * Метод, который оповещает родителя о том, что диалоговое окно закрыто
+   * @function
+   * @private
+   */
   private closePopup(): void {
     this.$emit('closePopup');
   }
 
+  private btnAddNote(): void {
+    this.closePopup();
+    this.$emit('createNote', this.noteName, this.items);
+  }
+
+  /**
+   * Метод, отвечающий за пополнение задач
+   * @function
+   * @private
+   */
   private addItem(): void {
     const maxId = Math.max(...this.items.map((i) => i.id));
+    // Проверка на случай если удалить все задачи, при создании заметки.
     if (maxId >= 0) {
       this.items.push({
         id: maxId + 1,
@@ -72,6 +105,11 @@ export default class ModalWindow extends Vue {
     }
   }
 
+  /**
+   * Метод, отвечающий за удаление задачи
+   * @function
+   * @private
+   */
   private deleteItem(index: number): void {
     this.items.splice(index, 1);
   }
@@ -162,7 +200,8 @@ export default class ModalWindow extends Vue {
       justify-content: flex-end;
       align-items: center;
 
-      .footer_btn_ok {
+    }
+    .btn_add {
         padding: 10px;
         background: #63c383;
         border: none;
@@ -174,7 +213,6 @@ export default class ModalWindow extends Vue {
           background: #3cb464;
         }
       }
-    }
   }
 }
 </style>
