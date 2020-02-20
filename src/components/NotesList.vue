@@ -7,17 +7,19 @@
       <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
     </p>
     <h3>Список заметок</h3>
-    <button class="btn_ShowPopup" v-on:click="showPopupCreate">
+    <button class="btn_showPopup" v-on:click="showPopupCreate">
       &#10010; Создать новую заметку
     </button>
     <div v-bind:class="{ popup_wrapper: isActive }">
       <ModalWindow class="popupCreate" v-if="isCreatePopup" @closePopup="closePopup"> </ModalWindow>
     </div>
-    <ul>
-      <li>
-        <div id="note"></div>
-      </li>
-    </ul>
+    <div class="boxNotes">
+      <ul>
+        <li>
+          <div id="note"></div>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -53,12 +55,13 @@ export default class Notes extends Vue {
 
 <style lang="less">
 .wrapper {
-  .btn_ShowPopup {
+  .btn_showPopup {
     height: 28px;
     background: #63c383;
     border: none;
     cursor: pointer;
     outline: none;
+    border-radius: 2px;
 
     &:hover {
       background: #3cb464;
@@ -86,29 +89,32 @@ export default class Notes extends Vue {
   h3 {
     margin: 40px 0 0;
   }
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  li {
-    display: inline-block;
-    margin: 10px;
+  .boxNotes {
+    ul {
+      list-style-type: none;
+      padding: 0;
 
-    &:hover {
-      box-shadow:
-      1px 1px #979797,
-      2px 2px #979797,
-      3px 3px #979797,
-      4px 4px #979797,
-      5px 5px #979797,
-      6px 6px #979797,
-      7px 7px #979797;
-      -webkit-transform: translateX(-7px);
-      transform: translateX(-7px);
-      -webkit-transition: all 0.3s ease;;
-      -moz-transition: all 0.3s ease;;
-      -o-transition: all 0.3s ease;;
-      transition: all 0.3s ease;
+      li {
+        display: inline-block;
+        margin: 10px;
+
+        &:hover {
+          box-shadow:
+          1px 1px #979797,
+          2px 2px #979797,
+          3px 3px #979797,
+          4px 4px #979797,
+          5px 5px #979797,
+          6px 6px #979797,
+          7px 7px #979797;
+          -webkit-transform: translateX(-7px);
+          transform: translateX(-7px);
+          -webkit-transition: all 0.3s ease;;
+          -moz-transition: all 0.3s ease;;
+          -o-transition: all 0.3s ease;;
+          transition: all 0.3s ease;
+        }
+      }
     }
   }
   a {

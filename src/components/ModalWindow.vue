@@ -10,21 +10,31 @@
       </div>
       <div class="modal-body">
         <slot name="body">
-          <input class="noteName" v-model="message" placeholder="Введите название заметки" />
-          <ul>
-            <li @v-for="(input, index) in inputs">
-              <input type="text">
-              <button @click="deleteRow(index)">Delete</button>
-            </li>
-          </ul>
-
-          <button v-on:click="addRow">Add row</button>
+          <div class="headerBody">
+            <input class="input" placeholder="Введите название заметки" />
+          </div>
+          <div class="tasksBox">
+            <fieldset>
+              <legend>Список задач</legend>
+              <ul>
+                <li v-for="(item, index) in items"
+                    v-bind:key="item.id">
+                  <input class="input" />
+                    <button class="deleteTask"
+                            v-on:click="deleteItem(index)">
+                      &#10006;
+                    </button>
+                </li>
+              </ul>
+              <button v-on:click="addItem">Добавить задачу</button>
+            </fieldset>
+          </div>
         </slot>
       </div>
 
       <div class="modal-footer">
         <slot name="footer">
-          <button class="modal-default-button">
+          <button class="footer_btn_ok">
             Добавить
           </button>
         </slot>
@@ -38,16 +48,32 @@ import { Component, Vue } from 'vue-property-decorator';
 
 @Component
 export default class ModalWindow extends Vue {
-  private inputs: object[] = [];
+  private items = [{
+    id: 0,
+    value: '',
+  }];
 
   private closePopup(): void {
     this.$emit('closePopup');
   }
 
-  private addRow() {
-    this.inputs.push({
-      one: '',
-    });
+  private addItem(): void {
+    const maxId = Math.max(...this.items.map((i) => i.id));
+    if (maxId >= 0) {
+      this.items.push({
+        id: maxId + 1,
+        value: '',
+      });
+    } else {
+      this.items.push({
+        id: 0,
+        value: '',
+      });
+    }
+  }
+
+  private deleteItem(index: number): void {
+    this.items.splice(index, 1);
   }
 }
 </script>
@@ -55,20 +81,25 @@ export default class ModalWindow extends Vue {
 
 .modal-wrapper {
   width: 550px;
-  height: 200px;
   max-height: 100%;
   max-width: 100%;
-  background: #fff;border-radius: 8px;
+  border-radius: 8px;
   box-shadow: 0 4px 5px 0 rgba(0,0,0,0.14),
               0 1px 10px 0 rgba(0,0,0,0.12),
               0 2px 4px -1px rgba(0,0,0,0.2);
+  background-color: #f5f5f5;
+  overflow: hidden;
 
   .modal-container {
-    margin: 5px;
 
     .modal-header {
+      background-color: #fff;
+      padding: 5px 10px 5px 10px;
+      border-bottom: 1px solid #dcdcdc;
+      height: 36px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
 
       .close_btn {
         background-color: transparent;
@@ -78,12 +109,44 @@ export default class ModalWindow extends Vue {
       }
     }
     .modal-body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      padding: 0 10px 0 10px;
+      flex-grow: 1;
 
-      .noteName {
-        width: 100%;
+      .headerBody {
+        display: flex;
+      }
+
+      .tasksBox {
+        height: 226px;
+        overflow: auto;
+
+        fieldset {
+          margin: 0;
+        }
+        ul {
+          list-style-type: none;
+          padding: 0;
+
+          li {
+            display: flex;
+            margin: 8px 0;
+            align-items: center;
+          }
+
+          .deleteTask {
+            background-color: #ed5e68;
+            border: none;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+          }
+        }
+      }
+      .input {
+        flex-grow: 1;
         padding: 12px 20px;
         margin: 8px 0;
         display: inline-block;
@@ -93,7 +156,24 @@ export default class ModalWindow extends Vue {
       }
     }
     .modal-footer {
-      bottom: 5px;
+      height: 50px;
+      padding: 5px 10px 5px 10px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
+      .footer_btn_ok {
+        padding: 10px;
+        background: #63c383;
+        border: none;
+        cursor: pointer;
+        outline: none;
+        border-radius: 2px;
+
+        &:hover {
+          background: #3cb464;
+        }
+      }
     }
   }
 }
