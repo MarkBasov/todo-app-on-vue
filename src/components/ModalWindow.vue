@@ -13,6 +13,7 @@
           <div class="headerBody">
             <input v-model="noteName" class="input" placeholder="Введите название заметки"
             />
+            <div class="error" v-if="validNameNote">Name is required</div>
           </div>
           <div class="tasksBox">
             <fieldset>
@@ -21,6 +22,7 @@
                 <li v-for="(item, index) in items"
                     v-bind:key="item.id">
                   <input class="input" v-model="item.value" />
+                  <div class="error" v-if="item.validate">Name is required</div>
                     <button class="deleteTask"
                             v-on:click="deleteItem(index)">
                       &#10006;
@@ -46,7 +48,6 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-// import { required, minLength } from 'vuelidate/lib/validators';
 
 /**
  * @class
@@ -59,16 +60,14 @@ export default class ModalWindow extends Vue {
   private items = [{
     id: 0,
     value: '',
+    validate: false,
   }];
 
-  // private validations = {
-  //   noteName: {
-  //     required,
-  //     minLength: minLength(4),
-  //   },
-  // };
-
   private noteName = '';
+
+  private validNameNote = false;
+
+  private validNameTask = false;
 
   /**
    * Метод, который оповещает родителя о том, что диалоговое окно закрыто
@@ -79,9 +78,14 @@ export default class ModalWindow extends Vue {
     this.$emit('closePopup');
   }
 
-  private btnAddNote(): void {
-    this.closePopup();
+  private btnAddNote(): boolean {
+    if (this.noteName === '') {
+      this.validNameNote = true;
+      return false;
+    }
     this.$emit('createNote', this.noteName, this.items);
+    this.closePopup();
+    return true;
   }
 
   /**
@@ -89,20 +93,31 @@ export default class ModalWindow extends Vue {
    * @function
    * @private
    */
-  private addItem(): void {
+  private addItem(): boolean {
+    this.validNameTask = false;
+    const lastItem = this.items[this.items.length - 1];
+    if (lastItem.value !== '') {
+      lastItem.validate = false;
+    } else {
+      lastItem.validate = true;
+      return false;
+    }
     const maxId = Math.max(...this.items.map((i) => i.id));
     // Проверка на случай если удалить все задачи, при создании заметки.
     if (maxId >= 0) {
       this.items.push({
         id: maxId + 1,
         value: '',
+        validate: false,
       });
     } else {
       this.items.push({
         id: 0,
         value: '',
+        validate: false,
       });
     }
+    return true;
   }
 
   /**
