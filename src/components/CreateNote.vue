@@ -11,9 +11,11 @@
       <div class="modal-body">
         <slot name="body">
           <div class="headerBody">
-            <input v-model="noteName" class="input" placeholder="Введите название заметки"
-            />
-            <div class="error" v-if="validNameNote">Name is required</div>
+            <div class="nameNote">
+              <input v-model.trim="noteName" class="input" placeholder="Введите название заметки"
+              />
+            </div>
+            <div class="error" v-if="validNameNote">Name of note is required</div>
           </div>
           <div class="tasksBox">
             <fieldset>
@@ -21,12 +23,14 @@
               <ul>
                 <li v-for="(item, index) in items"
                     v-bind:key="item.id">
-                  <input class="input" v-model="item.value" />
-                  <div class="error" v-if="item.validate">Name is required</div>
+                  <div class="task">
+                    <input class="input" v-model.trim="item.value" />
                     <button class="deleteTask"
                             v-on:click="deleteItem(index)">
                       &#10006;
                     </button>
+                  </div>
+                  <div class="error" v-if="item.validate">Name of task is required</div>
                 </li>
               </ul>
               <button class="btn_add" v-on:click="addItem">Добавить задачу</button>
@@ -95,11 +99,17 @@ export default class ModalWindow extends Vue {
    */
   private addItem(): boolean {
     this.validNameTask = false;
-    const lastItem = this.items[this.items.length - 1];
-    if (lastItem.value !== '') {
-      lastItem.validate = false;
-    } else {
-      lastItem.validate = true;
+    let proverkaProidena = true;
+    Object.values(this.items).map((item) => {
+      if (item.value === '') {
+        item.validate = true;
+        proverkaProidena = false;
+      } else {
+        item.validate = false;
+      }
+      return item;
+    });
+    if (!proverkaProidena) {
       return false;
     }
     const maxId = Math.max(...this.items.map((i) => i.id));
@@ -147,7 +157,7 @@ export default class ModalWindow extends Vue {
 
     .modal-header {
       background-color: #fff;
-      padding: 5px 10px 5px 10px;
+      padding: 5px 10px 5px 20px;
       border-bottom: 1px solid #dcdcdc;
       height: 36px;
       display: flex;
@@ -166,7 +176,9 @@ export default class ModalWindow extends Vue {
       flex-grow: 1;
 
       .headerBody {
-        display: flex;
+        .nameNote {
+          display: flex;
+        }
       }
 
       .tasksBox {
@@ -181,9 +193,12 @@ export default class ModalWindow extends Vue {
           padding: 0;
 
           li {
-            display: flex;
-            margin: 8px 0;
-            align-items: center;
+
+            .task {
+              display: flex;
+              margin: 8px 0;
+              align-items: center;
+            }
           }
 
           .deleteTask {
@@ -206,6 +221,12 @@ export default class ModalWindow extends Vue {
         border: 1px solid #ccc;
         border-radius: 4px;
         box-sizing: border-box;
+      }
+
+      .error {
+        text-align: left;
+        font-size: small;
+        color: #ed5e68;
       }
     }
     .modal-footer {

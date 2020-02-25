@@ -3,17 +3,23 @@
     <h1>{{ headerMsg }}</h1>
     <h3>Список заметок</h3>
     <div v-bind:class="{ popup_wrapper: isActive }">
-      <ModalWindow class="popupCreate" v-if="isCreatePopup"
-                   @createNote="addedNote"
+      <CreateNote class="popupWindow" v-if="isCreatePopup"
+                   @createNote="addNote"
                    @closePopup="closePopup">
-      </ModalWindow>
+      </CreateNote>
+    </div>
+    <div v-bind:class="{ popup_wrapper: isDelete }">
+      <ConfirmDelete class="popupWindow" v-if="isDeletePopup"
+                  @deleteConfirm="deleteConfirm"
+                  @closePopup="closePopup">
+      </ConfirmDelete>
     </div>
     <div class="boxNotes">
-      <button class="btn_showPopup" v-on:click="showPopupCreate">
+      <button class="btn_showPopup" v-on:click="showCreatePopup">
         &#10010; Создать новую заметку
       </button>
       <ul>
-        <li v-for="(item) in items"
+        <li v-for="(item, index) in items"
                     v-bind:key="item.id">
           <div id="note_wrapper">
             <h3 class="note_header">{{ item.noteName }}</h3>
@@ -21,10 +27,15 @@
               <div class="task" v-for="task in item.tasksList"
                     v-bind:key="task.id">
                 <label class="task_name" for="checkbox">
-                  <input type="checkbox" class="checkbox" v-model="checked"  />
+                  <input type="checkbox" class="checkbox" />
                   {{ task.value }}
                 </label>
               </div>
+            </div>
+            <div class="note_footer">
+              <button class="btn_deletePopup" v-on:click="deletePopup(index)">
+                &#10007; Удалить
+              </button>
             </div>
           </div>
         </li>
@@ -35,11 +46,13 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import ModalWindow from './ModalWindow.vue';
+import CreateNote from './CreateNote.vue';
+import ConfirmDelete from './ConfirmWindow.vue';
 
 @Component({
   components: {
-    ModalWindow,
+    CreateNote,
+    ConfirmDelete,
   },
 })
 export default class Notes extends Vue {
@@ -52,21 +65,39 @@ export default class Notes extends Vue {
     checked: false,
   }];
 
+  mounted() {
+    if (localStorage.getItem('tasks')) {
+      try {
+        this.items = JSON.parse(localStorage.getItem('tasks') || '{}');
+      } catch (e) {
+        localStorage.removeItem('tasks');
+      }
+    }
+  }
+
   private isCreatePopup = false;
 
   private isActive = false;
 
+  private isDeletePopup = false;
+
+  private isDelete = false;
+
+  private watchIndex = -1;
+
   private closePopup(): void {
     this.isCreatePopup = false;
     this.isActive = false;
+    this.isDeletePopup = false;
+    this.isDelete = false;
   }
 
-  private showPopupCreate(): void {
+  private showCreatePopup(): void {
     this.isCreatePopup = true;
     this.isActive = true;
   }
 
-  protected addedNote(noteName: string, tasksList: any, checked = false): void {
+  protected addNote(noteName: string, tasksList: Array<object>, checked = false): void {
     const maxId = Math.max(...this.items.map((i) => i.id));
     // Проверка на случай если удалить все задачи, при создании заметки.
     if (maxId >= 0) {
@@ -84,6 +115,27 @@ export default class Notes extends Vue {
         checked,
       });
     }
+    this.saveData();
+  }
+
+  private saveData(): void {
+    const parsed = JSON.stringify(this.items);
+    localStorage.setItem('tasks', parsed);
+  }
+
+  private deleteConfirm(isConfirmed: boolean): void {
+    if (isConfirmed) {
+      this.items.splice(this.watchIndex, 1);
+      this.saveData();
+    }
+    this.watchIndex = -1;
+    this.closePopup();
+  }
+
+  private deletePopup(index: number): void {
+    this.isDeletePopup = true;
+    this.isDelete = true;
+    this.watchIndex = index;
   }
 }
 </script>
@@ -118,7 +170,7 @@ export default class Notes extends Vue {
     overflow: auto;
     z-index: 10;
 
-    .popupCreate {
+    .popupWindow {
       position: absolute;
       z-index: 11;
     }
@@ -139,7 +191,7 @@ export default class Notes extends Vue {
 
         #note_wrapper {
           border: 1px;
-          height: 200px;
+          height: 210px;
           width: 400px;
           max-width: 100%;
           background-color: #fff;
@@ -159,14 +211,20 @@ export default class Notes extends Vue {
 
           .note_header {
             margin: 0 15px 0 15px;
-            padding: 10px 15px 10px 15px;
+            padding: 10px 0 10px 0;
             font-size: 16px;
             font-weight: normal;
             text-align: left;
             border-bottom: 1px solid darkgray;
+            height: 18px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
           }
           .note_body {
-            margin: 10px 15px 10px 15px;
+            margin: 10px 15px 0px 15px;
+            height: 120px;
+            overflow: scroll;
 
             .task {
               display: flex;
@@ -195,6 +253,21 @@ export default class Notes extends Vue {
                 text-align: center;
                 line-height: 15px;
               }
+            }
+          }
+          .note_footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-right: 15px;
+
+            .btn_deletePopup {
+              height: 28px;
+              background: #ed5e68;
+              border: none;
+              cursor: pointer;
+              outline: none;
+              border-radius: 2px;
+              display: block;
             }
           }
         }
