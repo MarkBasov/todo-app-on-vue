@@ -36,6 +36,11 @@
               <button class="btn_deletePopup" v-on:click="deletePopup(index)">
                 &#10007; Удалить
               </button>
+              <button class="btn_change" v-on:click="changeNote()">
+                &#10007; Изменить
+              </button>
+              <router-link to="/changePage">go to foooooooo</router-link>
+              <router-view></router-view>
             </div>
           </div>
         </li>
@@ -48,6 +53,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import CreateNote from './CreateNote.vue';
 import ConfirmDelete from './ConfirmWindow.vue';
+import TodoChange from './TodoChange.vue';
 
 @Component({
   components: {
@@ -84,6 +90,8 @@ export default class Notes extends Vue {
   private isDelete = false;
 
   private watchIndex = -1;
+
+  private test = 0;
 
   private closePopup(): void {
     this.isCreatePopup = false;
