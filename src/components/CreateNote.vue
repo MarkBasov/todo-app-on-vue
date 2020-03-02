@@ -5,7 +5,7 @@
       <div class="modal-header">
         <slot name="header">
           <span>Создание новой заметки</span>
-          <button class="close_btn" v-on:click="closePopup">&#10006;</button>
+          <button class="close_btn" @click="closePopup">&#10006;</button>
         </slot>
       </div>
       <div class="modal-body">
@@ -22,18 +22,18 @@
               <legend>Список задач</legend>
               <ul>
                 <li v-for="(item, index) in items"
-                    v-bind:key="item.id">
+                    :key="item.id">
                   <div class="task">
                     <input class="input" v-model.trim="item.value" />
                     <button class="deleteTask"
-                            v-on:click="deleteItem(index)">
+                            @click="deleteItem(index)">
                       &#10006;
                     </button>
                   </div>
                   <div class="error" v-if="item.validate">Name of task is required</div>
                 </li>
               </ul>
-              <button class="btn_add" v-on:click="addItem">Добавить задачу</button>
+              <button class="btn_add" @click="addItem">Добавить задачу</button>
             </fieldset>
           </div>
         </slot>
@@ -41,7 +41,7 @@
 
       <div class="modal-footer">
         <slot name="footer">
-          <button v-on:click="btnAddNote" class="btn_add">
+          <button @click="btnAddNote" class="btn_add">
             Добавить
           </button>
         </slot>
@@ -99,17 +99,17 @@ export default class ModalWindow extends Vue {
    */
   private addItem(): boolean {
     this.validNameTask = false;
-    let proverkaProidena = true;
+    let verification = true;
     Object.values(this.items).map((item) => {
       if (item.value === '') {
         item.validate = true;
-        proverkaProidena = false;
+        verification = false;
       } else {
         item.validate = false;
       }
       return item;
     });
-    if (!proverkaProidena) {
+    if (!verification) {
       return false;
     }
     const maxId = Math.max(...this.items.map((i) => i.id));

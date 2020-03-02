@@ -5,7 +5,7 @@
       <div class="confirm-header">
         <slot name="header">
           <span>Удалить заметку?</span>
-          <button class="close_btn" v-on:click="closePopup">&#10006;</button>
+          <button class="close_btn" @click="closePopup">&#10006;</button>
         </slot>
       </div>
       <div class="confirm-body">
@@ -18,10 +18,10 @@
 
       <div class="confirm-footer">
         <slot name="footer">
-          <button v-on:click="btnCancelDeleting" class="btn_no">
+          <button @click="btnCancelDeleting" class="btn_no">
             Нет, оставить заметку
           </button>
-          <button v-on:click="btnDeleteNote" class="btn_yes">
+          <button @click="btnDeleteNote" class="btn_yes">
             Да, удалить заметку
           </button>
         </slot>

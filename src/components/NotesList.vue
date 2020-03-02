@@ -15,7 +15,7 @@
       </ConfirmDelete>
     </div>
     <div class="boxNotes">
-      <button class="btn_showPopup" v-on:click="showCreatePopup">
+      <button class="btn_showPopup" @click="showCreatePopup">
         &#10010; Создать новую заметку
       </button>
       <ul>
@@ -25,22 +25,21 @@
             <h3 class="note_header">{{ item.noteName }}</h3>
             <div class="note_body">
               <div class="task" v-for="task in item.tasksList"
-                    v-bind:key="task.id">
+                    :key="task.id">
                 <label class="task_name" for="checkbox">
-                  <input type="checkbox" class="checkbox" />
+                  <input type="checkbox" class="checkbox" disabled />
                   {{ task.value }}
                 </label>
               </div>
             </div>
             <div class="note_footer">
-              <button class="btn_deletePopup" v-on:click="deletePopup(index)">
+              <button class="btn_deletePopup" @click="deletePopup(index)">
                 &#10007; Удалить
               </button>
-              <button class="btn_change" v-on:click="changeNote()">
+              <button class="btn_change"
+                      @click="changeNote(index, item.noteName, item.tasksList)">
                 &#10007; Изменить
               </button>
-              <router-link to="/changePage">go to foooooooo</router-link>
-              <router-view></router-view>
             </div>
           </div>
         </li>
@@ -53,7 +52,6 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import CreateNote from './CreateNote.vue';
 import ConfirmDelete from './ConfirmWindow.vue';
-import TodoChange from './TodoChange.vue';
 
 @Component({
   components: {
@@ -105,6 +103,11 @@ export default class Notes extends Vue {
     this.isActive = true;
   }
 
+  private changeNote(index: number, noteName: string, tasksList: Array<object>): void {
+    const taskListJson = JSON.stringify(tasksList);
+    this.$router.replace({ name: 'changePage', params: { name: noteName, tasksJson: taskListJson } });
+  }
+
   protected addNote(noteName: string, tasksList: Array<object>, checked = false): void {
     const maxId = Math.max(...this.items.map((i) => i.id));
     // Проверка на случай если удалить все задачи, при создании заметки.
@@ -149,6 +152,9 @@ export default class Notes extends Vue {
 </script>
 
 <style lang="less">
+* {
+  box-sizing: border-box;
+}
 .wrapper {
   .btn_showPopup {
     height: 28px;
@@ -224,14 +230,14 @@ export default class Notes extends Vue {
             font-weight: normal;
             text-align: left;
             border-bottom: 1px solid darkgray;
-            height: 18px;
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
+            min-height: 39px;
           }
           .note_body {
             margin: 10px 15px 0px 15px;
-            height: 120px;
+            max-height: 120px;
             overflow: scroll;
 
             .task {
